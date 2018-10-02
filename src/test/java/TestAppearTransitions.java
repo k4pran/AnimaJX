@@ -6,7 +6,7 @@ import org.junit.Test;
 public class TestAppearTransitions {
 
     @Ignore
-    public void SquareShouldFadeIn(){
+    public void squareShouldFadeIn(){
         double width = 600;
         double height = 600;
 
@@ -24,8 +24,8 @@ public class TestAppearTransitions {
         Application.launch(AnimationJX.class, "--width=" + Double.toString(width), "--height=" + Double.toString(height));
     }
 
-    @Test
-    public void NestedSquaresShouldFadeIn(){
+    @Ignore
+    public void nestedSquaresShouldFadeIn(){
         double width = 600;
         double height = 600;
 
@@ -119,6 +119,24 @@ public class TestAppearTransitions {
         sequenceJX.AddAnimatedObject(transitionJXJ);
         sequenceJX.AddAnimatedObject(transitionJXK);
 
+        sequenceJX.play();
+
+        Application.launch(AnimationJX.class, "--width=" + Double.toString(width), "--height=" + Double.toString(height));
+    }
+
+    @Test
+    public void squareShouldAppearFrom45Degrees(){
+        double width = 600;
+        double height = 600;
+
+        ShapeJX square = ShapeJX.fromSquare(300);
+        square.fillWith(Color.RED);
+
+        TransitionJX transitionJX = AppearTransitionJX.appearFromAngle(500, 5000, 45,
+                width / 2,  height / 2, square);
+
+        SequenceJX sequenceJX = new SequenceJX();
+        sequenceJX.AddAnimatedObject(transitionJX);
         sequenceJX.play();
 
         Application.launch(AnimationJX.class, "--width=" + Double.toString(width), "--height=" + Double.toString(height));

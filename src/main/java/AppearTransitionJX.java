@@ -33,22 +33,19 @@ public class AppearTransitionJX implements TransitionJX {
         return appearTransitionJX;
     }
 
-    public static AppearTransitionJX appearMoveTo(double start, double duration,
-                                                  double fromAngle, double endX, double endY, ObjJX objJX){
+    public static AppearTransitionJX appearFromAngle(double start, double duration,
+                                                     double fromAngle, double endX, double endY, ObjJX objJX){
         AppearTransitionJX appearTransitionJX = new AppearTransitionJX();
-
-        double centerX = AnimationJX.getWidth() / 2;
-        double centerY = AnimationJX.getHeight() / 2;
 
         fromAngle = (fromAngle - 90) * (Math.PI / 180);
 
         double a = Math.cos(fromAngle);
         double b = Math.sin(fromAngle);
 
-        double distA = (0 - centerX) / a;
-        double distB = (AnimationJX.getWidth() - centerX) / a;
-        double distC = (0 - centerY) / b;
-        double distD = (AnimationJX.getHeight() - centerY) / b;
+        double distA = (0 - endX) / a;
+        double distB = (AnimationJX.getWidth() - endX) / a;
+        double distC = (0 - endY) / b;
+        double distD = (AnimationJX.getHeight() - endY) / b;
         ArrayList<Double> distances = new ArrayList<>(Arrays.asList(distA, distB, distC, distD));
 
         double smallestNonNeg = distances.get(0);
@@ -61,13 +58,8 @@ public class AppearTransitionJX implements TransitionJX {
             }
         }
 
-        double startX = centerX + smallestNonNeg * a;
-        double startY = centerY + smallestNonNeg * b;
-        double offsetX = objJX.getNode().getBoundsInParent().getWidth() / 2;
-        double offsetY = objJX.getNode().getBoundsInParent().getHeight() / 2;
-
-        startX = startX > centerX ? startX + offsetX : startX - offsetX;
-        startY = startY > centerY ? startY + offsetY : startY - offsetY;
+        double startX = endX + smallestNonNeg * a;
+        double startY = endY + smallestNonNeg * b;
 
         Path path = new Path();
         path.getElements().add (new MoveTo (startX, startY));
