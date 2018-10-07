@@ -23,6 +23,12 @@ public class AppearTransitionJX implements TransitionJX {
         AppearTransitionJX appearTransitionJX = new AppearTransitionJX();
         FadeTransition fadeTransition = new FadeTransition(new Duration(duration), objJX.getNode());
 
+        if (startVal > endVal) {
+            double temp = endVal;
+            endVal = startVal;
+            startVal = temp;
+        }
+
         fadeTransition.setFromValue(startVal);
         fadeTransition.setToValue(endVal);
 
