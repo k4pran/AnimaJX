@@ -16,7 +16,7 @@ public class SequenceJX {
 
     public void AddStaticObject(ObjJX objJX, double timeToAppear, double timeToDisappear){
         objJX.getNode().setVisible(false);
-        SceneController.getRootView().getChildren().add(objJX.getNode());
+        SceneController.addView(objJX.getNode());
 
         timeline.getKeyFrames().add(new KeyFrame(Duration.millis(timeToAppear),
                 new KeyValue(objJX.getNode().visibleProperty(), true)));
@@ -26,7 +26,7 @@ public class SequenceJX {
     }
 
     public void AddAnimatedObject(TransitionJX transitionJX){
-        SceneController.getRootView().getChildren().add(transitionJX.getNode());
+        SceneController.addView(transitionJX.getNode());
         sequence.getChildren().add(transitionJX.getTransition());
     }
 
