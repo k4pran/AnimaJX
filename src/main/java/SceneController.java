@@ -1,15 +1,20 @@
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 
-public class SceneController {
+public final class SceneController {
 
-    private static Pane rootView;
+    private static final Pane rootView;
 
     static {
         rootView = new Pane();
     }
 
-    public static Pane getRootView(){
+    protected static Pane getRootView() {
         return rootView;
+    }
+
+    protected static void addView(Node view){
+        rootView.getChildren().add(view);
     }
 
     public static void setBackgroundColor(String color){
