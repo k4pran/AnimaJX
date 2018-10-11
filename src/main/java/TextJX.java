@@ -16,6 +16,7 @@ public class TextJX implements ObjJX {
 
     private Canvas dynamicCanvas;
     private GraphicsContext gfx;
+    private double yOffset;
 
     private TextJX(){}
 
@@ -26,13 +27,24 @@ public class TextJX implements ObjJX {
         textJX.gfx.setStroke(Color.BLACK);
 
         FontMetrics fm = Toolkit.getToolkit().getFontLoader().getFontMetrics(textJX.gfx.getFont());
-        textJX.dynamicCanvas.setWidth(fm.computeStringWidth("Hello World"));
+        textJX.dynamicCanvas.setWidth(fm.computeStringWidth(text));
         textJX.dynamicCanvas.setHeight(fm.getAscent() - fm.getDescent() + textJX.gfx.getLineWidth());
-        textJX.gfx.strokeText(text, 0, fm.getAscent() - fm.getDescent());
+        textJX.yOffset = fm.getAscent() - fm.getDescent();
+        textJX.gfx.strokeText(text, 0, textJX.yOffset);
         return textJX;
+    }
+
+    public Canvas getDynamicCanvas() {
+        return dynamicCanvas;
     }
 
     public Node getNode() {
         return dynamicCanvas;
+    }
+
+    @Override
+    public Point offsetPoint(Point point) {
+        point.setY(point.getY() + yOffset);
+        return point;
     }
 }
