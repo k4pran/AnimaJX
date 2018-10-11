@@ -24,7 +24,7 @@ public class TestAppearTransitions {
         Application.launch(AnimationJX.class, "--width=" + Double.toString(width), "--height=" + Double.toString(height));
     }
 
-    @Ignore
+    @Test
     public void nestedSquaresShouldFadeIn(){
         double width = 600;
         double height = 600;
@@ -124,7 +124,7 @@ public class TestAppearTransitions {
         Application.launch(AnimationJX.class, "--width=" + Double.toString(width), "--height=" + Double.toString(height));
     }
 
-    @Test
+    @Ignore
     public void squareShouldAppearFrom45Degrees(){
         double width = 600;
         double height = 600;
