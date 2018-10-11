@@ -1,4 +1,3 @@
-import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.PathTransition;
 import javafx.animation.Transition;
@@ -13,9 +12,18 @@ import java.util.Arrays;
 
 public class AppearTransitionJX implements TransitionJX {
 
+    /******************************
+     *         Properties         *
+     ******************************/
+
     private Transition transition;
     private ObjJX objJX;
+    private double duration;
     private double start;
+
+    /******************************
+     *         Constructors       *
+     ******************************/
 
     private AppearTransitionJX(){}
 
@@ -35,6 +43,7 @@ public class AppearTransitionJX implements TransitionJX {
         appearTransitionJX.transition = fadeTransition;
         appearTransitionJX.objJX = objJX;
         appearTransitionJX.start = start;
+        appearTransitionJX.duration = duration;
 
         return appearTransitionJX;
     }
@@ -79,8 +88,13 @@ public class AppearTransitionJX implements TransitionJX {
         appearTransitionJX.objJX = objJX;
         appearTransitionJX.transition = pathTransition;
         appearTransitionJX.start = start;
+        appearTransitionJX.duration = duration;
         return appearTransitionJX;
     }
+
+    /******************************
+     *         General            *
+     ******************************/
 
     public void autoReverse(boolean flag){
         transition.setAutoReverse(flag);
@@ -90,6 +104,10 @@ public class AppearTransitionJX implements TransitionJX {
         transition.setCycleCount(count);
     }
 
+    /******************************
+     *         Overrides          *
+     ******************************/
+
     @Override
     public Node getNode() {
         return objJX.getNode();
@@ -98,5 +116,10 @@ public class AppearTransitionJX implements TransitionJX {
     @Override
     public Transition getTransition() {
         return transition;
+    }
+
+    @Override
+    public double getStart() {
+        return start;
     }
 }

@@ -5,9 +5,17 @@ import javafx.util.Duration;
 
 public class DisappearTransitionJX implements TransitionJX {
 
+    /******************************
+     *         Properties         *
+     ******************************/
+
     private Transition transition;
     private ObjJX objJX;
     private double start;
+
+    /******************************
+     *         Constructors       *
+     ******************************/
 
     private DisappearTransitionJX(){}
 
@@ -30,6 +38,10 @@ public class DisappearTransitionJX implements TransitionJX {
         return disappearTransitionJX;
     }
 
+    /******************************
+     *         Overriders         *
+     ******************************/
+
     @Override
     public Node getNode() {
         return objJX.getNode();
@@ -38,5 +50,10 @@ public class DisappearTransitionJX implements TransitionJX {
     @Override
     public Transition getTransition() {
         return transition;
+    }
+
+    @Override
+    public double getStart() {
+        return start;
     }
 }
