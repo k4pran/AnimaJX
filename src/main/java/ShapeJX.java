@@ -1,10 +1,16 @@
 import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import org.apache.commons.lang.ArrayUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ShapeJX implements ObjJX {
+
+    /******************************
+     *         Properties         *
+     ******************************/
 
     private DynamicCanvas dynamicCanvas;
     private GraphicsContext gfx;
@@ -12,41 +18,48 @@ public class ShapeJX implements ObjJX {
 
     private ArrayList<Point> points;
 
+    private Point centerPoint;
     private double width;
     private double height;
     private double rotation;
     private double cornerArc;
 
-    private ShapeJX(){};
+    private double offsetX;
+    private double offsetY;
+
+    private ShapeJX(){}
+
+    /******************************
+     *         Constructors       *
+     ******************************/
 
     public static ShapeJX fromSquare(double length){
         return fromRect(length, length);
     }
 
     public static ShapeJX fromRect(double width, double height){
-        ShapeJX animShape = new ShapeJX();
-        animShape.drawMethod = DrawMethod.POLYGON;
+        ShapeJX shapeJX = new ShapeJX();
+        shapeJX.drawMethod = DrawMethod.POLYGON;
 
-        animShape.dynamicCanvas = new DynamicCanvas(width, height);
-        animShape.gfx = animShape.dynamicCanvas.getGraphicsContext2D();
+        shapeJX.dynamicCanvas = new DynamicCanvas(width, height);
+        shapeJX.gfx = shapeJX.dynamicCanvas.getGraphicsContext2D();
 
-        animShape.points = new ArrayList<>();
-        animShape.points.add(new Point(1, 1));
-        animShape.points.add(new Point(width + 1, 1));
-        animShape.points.add(new Point(width + 1, height + 1));
-        animShape.points.add(new Point(1, height + 1));
+        shapeJX.points = new ArrayList<>();
+        shapeJX.points.add(new Point(1, 1));
+        shapeJX.points.add(new Point(width + 1, 1));
+        shapeJX.points.add(new Point(width + 1, height + 1));
+        shapeJX.points.add(new Point(1, height + 1));
 
-        animShape.dynamicCanvas = new DynamicCanvas(width + 2,
+        shapeJX.dynamicCanvas = new DynamicCanvas(width + 2,
                 height + 2); // + 2 to account for line width
-        animShape.gfx = animShape.dynamicCanvas.getGraphicsContext2D();
+        shapeJX.gfx = shapeJX.dynamicCanvas.getGraphicsContext2D();
 
-        animShape.toDefaultVals();
-        animShape.draw();
-        return animShape;
+        shapeJX.toDefaultVals();
+        shapeJX.draw();
+        return shapeJX;
     }
 
-    public static ShapeJX fromRoundedTriangle(double x1, double y1, double x2, double y2, double x3, double y3,
-                                              double roundedRatioPart, double straightRatioPart){
+    public static ShapeJX fromRoundedTriangle(double x1, double y1, double x2, double y2, double x3, double y3, double roundedRatioPart, double straightRatioPart){
         ShapeJX shapeJX = fromTriangle(x1, y1, x2, y2, x3, y3);
         shapeJX.drawMethod = DrawMethod.ROUNDED_POLYGON;
         shapeJX.cornerArc = roundedRatioPart / straightRatioPart;
@@ -68,7 +81,6 @@ public class ShapeJX implements ObjJX {
             yVals.add(points.get(i).getY());
         }
 
-
         double minX = GenUtils.getMinValue(xVals);
         double minY = GenUtils.getMinValue(yVals);
         double maxX = GenUtils.getMaxValue(xVals);
@@ -84,21 +96,21 @@ public class ShapeJX implements ObjJX {
 
 
     public static ShapeJX fromCircle(double radius){
-        ShapeJX animShape = new ShapeJX();
-//
-//        DynamicCanvas canvas = new DynamicCanvas(radius * 2, radius * 2);
-//        GraphicsContext gfx = canvas.getGraphicsContext2D();
-//        gfx.setStroke(Color.BLACK);
-//        gfx.strokeOval(0, 0, radius, radius);
-//
-//        animShape.dynamicCanvas = canvas;
-//        animShape.toDefaultVals();
-        return animShape;
+        ShapeJX shapeJX = new ShapeJX();
+
+        DynamicCanvas canvas = new DynamicCanvas(radius * 2, radius * 2);
+        GraphicsContext gfx = canvas.getGraphicsContext2D();
+        gfx.setStroke(Color.BLACK);
+        gfx.strokeOval(0, 0, radius, radius);
+
+        shapeJX.dynamicCanvas = canvas;
+        shapeJX.toDefaultVals();
+        return shapeJX;
     }
 
     public static ShapeJX fromTriangle(double x1, double y1, double x2, double y2, double x3, double y3){
-        ShapeJX animShape = new ShapeJX();
-        animShape.drawMethod = DrawMethod.POLYGON;
+        ShapeJX shapeJX = new ShapeJX();
+        shapeJX.drawMethod = DrawMethod.POLYGON;
 
         ArrayList<Double> xVals = new ArrayList<Double>(){{
             add(x1);
@@ -116,26 +128,30 @@ public class ShapeJX implements ObjJX {
         double maxX = GenUtils.getMaxValue(xVals);
         double maxY = GenUtils.getMaxValue(yVals);
 
-        animShape.points = new ArrayList<>();
-        animShape.points.add(new Point(x1 - minX + 1, y1 - minY + 1));
-        animShape.points.add(new Point(x2 - minX + 1, y2 - minY + 1));
-        animShape.points.add(new Point(x3 - minX + 1, y3 - minY + 1));
+        shapeJX.points = new ArrayList<>();
+        shapeJX.points.add(new Point(x1 - minX + 1, y1 - minY + 1));
+        shapeJX.points.add(new Point(x2 - minX + 1, y2 - minY + 1));
+        shapeJX.points.add(new Point(x3 - minX + 1, y3 - minY + 1));
 
-        animShape.dynamicCanvas = new DynamicCanvas(maxX - minX + 2,
-                                                    maxY - minY + 2); // + 2 to account for line width
-        animShape.gfx = animShape.dynamicCanvas.getGraphicsContext2D();
+        shapeJX.dynamicCanvas = new DynamicCanvas(maxX - minX + 2,
+                maxY - minY + 2); // + 2 to account for line width
+        shapeJX.gfx = shapeJX.dynamicCanvas.getGraphicsContext2D();
 
-        animShape.toDefaultVals();
-        animShape.draw();
-        return animShape;
+        shapeJX.toDefaultVals();
+        shapeJX.draw();
+        return shapeJX;
     }
 
-    private void draw() {
+    /******************************
+     *         General            *
+     ******************************/
+
+    public void draw() {
         switch (drawMethod) {
             case POLYGON:
                 gfx.clearRect(0, 0, dynamicCanvas.getWidth(), dynamicCanvas.getHeight());
-                gfx.fillPolygon(getXVals(), getYVals(), points.size());
-                gfx.strokePolygon(getXVals(), getYVals(), points.size());
+                gfx.fillPolygon(ArrayUtils.toPrimitive(getXVals()), ArrayUtils.toPrimitive(getYVals()), points.size());
+                gfx.strokePolygon(ArrayUtils.toPrimitive(getXVals()), ArrayUtils.toPrimitive(getYVals()), points.size());
                 break;
 
             case ROUNDED_POLYGON:
@@ -174,31 +190,21 @@ public class ShapeJX implements ObjJX {
         }
     }
 
-    private double[] getXVals() {
-        double[] xVals = new double[points.size()];
-        for (int i = 0; i < points.size(); i++) {
-            xVals[i] = points.get(i).getX();
-        }
-        return xVals;
-    }
-
-    private double[] getYVals() {
-        double[] yVals = new double[points.size()];
-        for (int i = 0; i < points.size(); i++) {
-            yVals[i] = points.get(i).getY();
-        }
-        return yVals;
-    }
-
-    public GraphicsContext getGfx() {
-        return gfx;
-    }
-
     public void toDefaultVals(){
-        gfx.setFill(Color.TRANSPARENT);
-        gfx.setStroke(Color.BLACK);
-        dynamicCanvas.setLayoutX(0);
-        dynamicCanvas.setLayoutY(0);
+        this.gfx.setFill(Color.TRANSPARENT);
+        this.gfx.setStroke(Color.BLACK);
+        this.dynamicCanvas.setLayoutX(0);
+        this.dynamicCanvas.setLayoutY(0);
+
+        double minX = GenUtils.getMinValue(Arrays.asList(getXVals()));
+        double minY = GenUtils.getMinValue(Arrays.asList(getYVals()));
+        double maxX = GenUtils.getMaxValue(Arrays.asList(getXVals()));
+        double maxY = GenUtils.getMaxValue(Arrays.asList(getYVals()));
+
+        this.rotation = 0;
+        this.setCenter();
+        this.width = maxX - minX;
+        this.height = maxY - minY;
     }
 
     public void pointScale(double scaleFactor) {
@@ -231,19 +237,105 @@ public class ShapeJX implements ObjJX {
         draw();
     }
 
+    /******************************
+     *         Accessors          *
+     ******************************/
+
+    private Double[] getXVals() {
+        Double[] xVals = new Double[points.size()];
+        for (int i = 0; i < points.size(); i++) {
+            xVals[i] = points.get(i).getX() + offsetX;
+        }
+        return xVals;
+    }
+
+    private Double[] getYVals() {
+        Double[] yVals = new Double[points.size()];
+        for (int i = 0; i < points.size(); i++) {
+            yVals[i] = points.get(i).getY() + offsetY;
+        }
+        return yVals;
+    }
+
     public void setPosition(double x, double y){
         dynamicCanvas.setLayoutX(x);
         dynamicCanvas.setLayoutY(y);
     }
 
-    public Node getNode() {
-        return dynamicCanvas;
+    private void setCenter() {
+        double maxX = GenUtils.getMaxValue(Arrays.asList(getXVals()));
+        double maxY = GenUtils.getMaxValue(Arrays.asList(getYVals()));
+        double minX = GenUtils.getMinValue(Arrays.asList(getXVals()));
+        double minY = GenUtils.getMinValue(Arrays.asList(getYVals()));
+
+        centerPoint = new Point(maxX - ((maxX - minX) / 2) - offsetX, maxY - ((maxY - minY) / 2) - offsetY);
+    }
+
+    public GraphicsContext getGfx() {
+        return gfx;
+    }
+
+    public Point getCenterPoint() {
+        return centerPoint;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+    }
+
+    public double getOffsetX() {
+        return offsetX;
+    }
+
+    public void setOffsetX(double offsetX) {
+        this.offsetX = offsetX;
+    }
+
+    public double getOffsetY() {
+        return offsetY;
+    }
+
+    public void setOffsetY(double offsetY) {
+        this.offsetY = offsetY;
+    }
+
+    public ArrayList<Point> getPoints() {
+        return points;
     }
 
     public DynamicCanvas getDynamicCanvas(){
         return dynamicCanvas;
     }
 
+    /******************************
+     *          Overrides         *
+     ******************************/
+
+    @Override
+    public Node getNode() {
+        return dynamicCanvas;
+    }
+
+    @Override
+    public Point offsetPoint(Point point) {
+        return point; // todo
+    }
+
+    /******************************
+     *           Inner            *
+     ******************************/
 
     enum DrawMethod {
         CIRCLE,
