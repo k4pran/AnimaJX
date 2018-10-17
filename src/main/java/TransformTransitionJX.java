@@ -3,7 +3,7 @@ import javafx.animation.Transition;
 import javafx.scene.Node;
 import javafx.util.Duration;
 
-public class TransformTransition implements TransitionJX {
+public class TransformTransitionJX implements TransitionJX {
 
     /******************************
      *         Properties         *
@@ -17,14 +17,14 @@ public class TransformTransition implements TransitionJX {
      *         Constructors       *
      ******************************/
 
-    private TransformTransition(){}
+    private TransformTransitionJX(){}
 
-    public static TransformTransition asSimpleScaling(double start, double duration,
-                                                      double endX, double endY, ObjJX objJX) {
-        TransformTransition transformTransition = new TransformTransition();
-        transformTransition.start = start;
-        transformTransition.objJX = objJX;
-        transformTransition.start = start;
+    public static TransformTransitionJX asSimpleScaling(double start, double duration,
+                                                        double endX, double endY, ObjJX objJX) {
+        TransformTransitionJX transformTransitionJX = new TransformTransitionJX();
+        transformTransitionJX.start = start;
+        transformTransitionJX.objJX = objJX;
+        transformTransitionJX.start = start;
 
         ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(duration), objJX.getNode());
         scaleTransition.setFromX(1);
@@ -32,21 +32,21 @@ public class TransformTransition implements TransitionJX {
         scaleTransition.setToX(endX);
         scaleTransition.setToY(endY);
 
-        transformTransition.transition = scaleTransition;
-        return transformTransition;
+        transformTransitionJX.transition = scaleTransition;
+        return transformTransitionJX;
     }
 
-    public static TransformTransition asPointScaling(double start, double duration, double scaleFactor, ShapeJX shapeJX) {
-        TransformTransition transformTransition = new TransformTransition();
-        transformTransition.start = start;
-        transformTransition.objJX = shapeJX;
-        transformTransition.start = start;
+    public static TransformTransitionJX asPointScaling(double start, double duration, double scaleFactor, ShapeJX shapeJX) {
+        TransformTransitionJX transformTransitionJX = new TransformTransitionJX();
+        transformTransitionJX.start = start;
+        transformTransitionJX.objJX = shapeJX;
+        transformTransitionJX.start = start;
 
         PointScaleTransition pointScaleTransition = new PointScaleTransition(shapeJX, shapeJX.getPoints(),
                 scaleFactor, duration);
-        transformTransition.transition = pointScaleTransition;
+        transformTransitionJX.transition = pointScaleTransition;
 
-        return transformTransition;
+        return transformTransitionJX;
 
     }
 
