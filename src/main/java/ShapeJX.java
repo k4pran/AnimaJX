@@ -2,6 +2,7 @@ import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import org.apache.commons.lang.ArrayUtils;
+import sun.security.provider.SHA;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,8 @@ public class ShapeJX implements ObjJX {
     private double offsetX;
     private double offsetY;
 
+    private static double CANVAS_PADDING = 4;
+
     private ShapeJX(){}
 
     /******************************
@@ -41,26 +44,25 @@ public class ShapeJX implements ObjJX {
         ShapeJX shapeJX = new ShapeJX();
         shapeJX.drawMethod = DrawMethod.POLYGON;
 
-        shapeJX.dynamicCanvas = new DynamicCanvas(width, height);
-        shapeJX.gfx = shapeJX.dynamicCanvas.getGraphicsContext2D();
-
         shapeJX.points = new ArrayList<>();
-        shapeJX.points.add(new Point(1, 1));
-        shapeJX.points.add(new Point(width + 1, 1));
-        shapeJX.points.add(new Point(width + 1, height + 1));
-        shapeJX.points.add(new Point(1, height + 1));
+        shapeJX.points.add(new Point(CANVAS_PADDING / 2, CANVAS_PADDING / 2));
+        shapeJX.points.add(new Point(width + CANVAS_PADDING / 2, CANVAS_PADDING / 2));
+        shapeJX.points.add(new Point(width + CANVAS_PADDING / 2, height + CANVAS_PADDING / 2));
+        shapeJX.points.add(new Point(CANVAS_PADDING / 2, height + CANVAS_PADDING / 2));
 
-        shapeJX.dynamicCanvas = new DynamicCanvas(width + 2,
-                height + 2); // + 2 to account for line width
+        shapeJX.dynamicCanvas = new DynamicCanvas(width + CANVAS_PADDING,
+                height + CANVAS_PADDING); // + 2 to account for line width
         shapeJX.gfx = shapeJX.dynamicCanvas.getGraphicsContext2D();
 
+        shapeJX.setOffsetX(-1);
+        shapeJX.setOffsetY(-1);
         shapeJX.toDefaultVals();
         shapeJX.draw();
         return shapeJX;
     }
 
-    public static ShapeJX fromRoundedTriangle(double x1, double y1, double x2, double y2, double x3, double y3, double roundedRatioPart, double straightRatioPart){
-        ShapeJX shapeJX = fromTriangle(x1, y1, x2, y2, x3, y3);
+    public static ShapeJX fromRoundedTriangle(Point a, Point b, Point c, double roundedRatioPart, double straightRatioPart){
+        ShapeJX shapeJX = fromTriangle(a, b, c);
         shapeJX.drawMethod = DrawMethod.ROUNDED_POLYGON;
         shapeJX.cornerArc = roundedRatioPart / straightRatioPart;
 
@@ -81,12 +83,11 @@ public class ShapeJX implements ObjJX {
             yVals.add(points.get(i).getY());
         }
 
-        double minX = GenUtils.getMinValue(xVals);
-        double minY = GenUtils.getMinValue(yVals);
-        double maxX = GenUtils.getMaxValue(xVals);
-        double maxY = GenUtils.getMaxValue(yVals);
+        Point minPoint = shapeJX.getMinPoint();
+        Point maxPoint = shapeJX.getMaxPoint();
 
-        shapeJX.dynamicCanvas = new DynamicCanvas(maxX - minX + 2, maxY - minY + 2);
+        shapeJX.dynamicCanvas = new DynamicCanvas(maxPoint.getX() - minPoint.getX() + 2,
+                                                  maxPoint.getY() - minPoint.getY() + 2);
         shapeJX.gfx = shapeJX.dynamicCanvas.getGraphicsContext2D();
 
         shapeJX.toDefaultVals();
@@ -108,35 +109,38 @@ public class ShapeJX implements ObjJX {
         return shapeJX;
     }
 
-    public static ShapeJX fromTriangle(double x1, double y1, double x2, double y2, double x3, double y3){
+    public static ShapeJX fromTriangle(Point a, Point b, Point c){
         ShapeJX shapeJX = new ShapeJX();
         shapeJX.drawMethod = DrawMethod.POLYGON;
 
         ArrayList<Double> xVals = new ArrayList<Double>(){{
-            add(x1);
-            add(x2);
-            add(x3);
+            add(a.getX());
+            add(b.getX());
+            add(c.getX());
         }};
         ArrayList<Double> yVals = new ArrayList<Double>(){{
-            add(y1);
-            add(y2);
-            add(y3);
+            add(a.getY());
+            add(b.getY());
+            add(c.getY());
         }};
 
-        double minX = GenUtils.getMinValue(xVals);
-        double minY = GenUtils.getMinValue(yVals);
-        double maxX = GenUtils.getMaxValue(xVals);
-        double maxY = GenUtils.getMaxValue(yVals);
+        shapeJX.setOffsetX(1);
+        shapeJX.setOffsetY(0);
+
+        Point minPoint = shapeJX.getMinPoint();
+        Point maxPoint = shapeJX.getMaxPoint();
 
         shapeJX.points = new ArrayList<>();
-        shapeJX.points.add(new Point(x1 - minX + 1, y1 - minY + 1));
-        shapeJX.points.add(new Point(x2 - minX + 1, y2 - minY + 1));
-        shapeJX.points.add(new Point(x3 - minX + 1, y3 - minY + 1));
+        shapeJX.points.add(new Point(a.getX() - minPoint.getX() + CANVAS_PADDING / 2, a.getY() - minPoint.getY() + CANVAS_PADDING / 2));
+        shapeJX.points.add(new Point(b.getX() - minPoint.getX() + CANVAS_PADDING / 2, b.getY() - minPoint.getY() + CANVAS_PADDING / 2));
+        shapeJX.points.add(new Point(c.getX() - minPoint.getX() + CANVAS_PADDING / 2, c.getY() - minPoint.getY() + CANVAS_PADDING / 2));
 
-        shapeJX.dynamicCanvas = new DynamicCanvas(maxX - minX + 2,
-                maxY - minY + 2); // + 2 to account for line width
+        shapeJX.dynamicCanvas = new DynamicCanvas(maxPoint.getX() - minPoint.getX() + CANVAS_PADDING,
+                maxPoint.getY() - minPoint.getY() + CANVAS_PADDING ); // + 2 to account for line width
         shapeJX.gfx = shapeJX.dynamicCanvas.getGraphicsContext2D();
 
+        shapeJX.getDynamicCanvas().setTranslateX(minPoint.getX() - 2);
+        shapeJX.getDynamicCanvas().setTranslateY(minPoint.getY());
         shapeJX.toDefaultVals();
         shapeJX.draw();
         return shapeJX;
@@ -150,6 +154,13 @@ public class ShapeJX implements ObjJX {
         switch (drawMethod) {
             case POLYGON:
                 gfx.clearRect(0, 0, dynamicCanvas.getWidth(), dynamicCanvas.getHeight());
+
+                Point maxPoint = getMaxPoint();
+                Point minPoint = getMinPoint();
+
+                dynamicCanvas.setWidth(maxPoint.getX() - minPoint.getX() + CANVAS_PADDING);
+                dynamicCanvas.setHeight(maxPoint.getY() - minPoint.getY() + CANVAS_PADDING);
+
                 gfx.fillPolygon(ArrayUtils.toPrimitive(getXVals()), ArrayUtils.toPrimitive(getYVals()), points.size());
                 gfx.strokePolygon(ArrayUtils.toPrimitive(getXVals()), ArrayUtils.toPrimitive(getYVals()), points.size());
                 break;
@@ -196,24 +207,35 @@ public class ShapeJX implements ObjJX {
         this.dynamicCanvas.setLayoutX(0);
         this.dynamicCanvas.setLayoutY(0);
 
-        double minX = GenUtils.getMinValue(Arrays.asList(getXVals()));
-        double minY = GenUtils.getMinValue(Arrays.asList(getYVals()));
-        double maxX = GenUtils.getMaxValue(Arrays.asList(getXVals()));
-        double maxY = GenUtils.getMaxValue(Arrays.asList(getYVals()));
+        Point maxPoint = getMaxPoint();
+        Point minPoint = getMinPoint();
 
         this.rotation = 0;
         this.setCenter();
-        this.width = maxX - minX;
-        this.height = maxY - minY;
+        this.width = maxPoint.getX() - minPoint.getX();
+        this.height = maxPoint.getY() - minPoint.getY();
     }
 
     public void pointScale(double scaleFactor) {
+        pointScaleX(scaleFactor);
+        pointScaleY(scaleFactor);
+    }
+
+    public void pointScaleX(double scaleFactor) {
+        double constOffset = points.get(0).getX() - points.get(0).getX() * scaleFactor;
         for (int i = 0; i < points.size(); i++) {
-            points.get(i).setX(points.get(i).getX() * scaleFactor);
-            points.get(i).setY(points.get(i).getY() * scaleFactor);
+            points.get(i).setX(points.get(i).getX() * scaleFactor + constOffset);
         }
-        dynamicCanvas.setWidth(dynamicCanvas.getWidth() * scaleFactor);
-        dynamicCanvas.setHeight(dynamicCanvas.getHeight() * scaleFactor);
+        dynamicCanvas.setWidth(dynamicCanvas.getWidth() * scaleFactor + ShapeJX.CANVAS_PADDING);
+        draw();
+    }
+
+    public void pointScaleY(double scaleFactor) {
+        double constOffset = points.get(0).getY() - points.get(0).getY() * scaleFactor;
+        for (int i = 0; i < points.size(); i++) {
+            points.get(i).setY(points.get(i).getY() * scaleFactor + constOffset);
+        }
+        dynamicCanvas.setHeight(dynamicCanvas.getHeight() * scaleFactor + ShapeJX.CANVAS_PADDING);
         draw();
     }
 
@@ -258,17 +280,27 @@ public class ShapeJX implements ObjJX {
     }
 
     public void setPosition(double x, double y){
-        dynamicCanvas.setLayoutX(x);
-        dynamicCanvas.setLayoutY(y);
+        dynamicCanvas.setLayoutX(x + getOffsetX());
+        dynamicCanvas.setLayoutY(y + getOffsetY());
     }
 
     private void setCenter() {
+        Point minPoint = getMinPoint();
+        Point maxPoint = getMaxPoint();
+        centerPoint = new Point(maxPoint.getX() - ((maxPoint.getX() - minPoint.getX()) / 2) - offsetX,
+                                maxPoint.getY() - ((maxPoint.getY() - minPoint.getY()) / 2) - offsetY);
+    }
+
+    public Point getMaxPoint() {
         double maxX = GenUtils.getMaxValue(Arrays.asList(getXVals()));
         double maxY = GenUtils.getMaxValue(Arrays.asList(getYVals()));
+        return new Point(maxX, maxY);
+    }
+
+    public Point getMinPoint() {
         double minX = GenUtils.getMinValue(Arrays.asList(getXVals()));
         double minY = GenUtils.getMinValue(Arrays.asList(getYVals()));
-
-        centerPoint = new Point(maxX - ((maxX - minX) / 2) - offsetX, maxY - ((maxY - minY) / 2) - offsetY);
+        return new Point(minX, minY);
     }
 
     public GraphicsContext getGfx() {
@@ -277,6 +309,19 @@ public class ShapeJX implements ObjJX {
 
     public Point getCenterPoint() {
         return centerPoint;
+    }
+
+    public void setWidth(double width) {
+        double scaleFactor = width / this.width;
+        pointScaleX(scaleFactor);
+        this.width = width;
+    }
+
+    public void setHeight(double height) {
+        double scaleFactor = height / this.height;
+        pointScaleY(scaleFactor);
+        this.height = height;
+        draw();
     }
 
     public double getWidth() {
@@ -294,6 +339,8 @@ public class ShapeJX implements ObjJX {
     public void setRotation(double rotation) {
         this.rotation = rotation;
     }
+
+
 
     public double getOffsetX() {
         return offsetX;
